@@ -1,16 +1,6 @@
-"use client";
-
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+import { LoginForm } from "./components/login-form";
 import { SignUpForm } from "./components/sign-up-form";
 
 export default function AuthenticationPage() {
@@ -24,18 +14,7 @@ export default function AuthenticationPage() {
 
         {/* Login */}
         <TabsContent value="login">
-          <Card>
-            <CardHeader>
-              <CardTitle>Login</CardTitle>
-              <CardDescription>Faça login para continuar.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {/* Campos de login viriam aqui */}
-            </CardContent>
-            <CardFooter>
-              <Button>Entrar</Button>
-            </CardFooter>
-          </Card>
+          <LoginForm />
         </TabsContent>
 
         {/* Registro */}
