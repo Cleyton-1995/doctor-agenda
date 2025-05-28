@@ -8,6 +8,7 @@ export const auth = betterAuth({
     provider: "pg",
     usePlural: true,
   }),
+  trustedOrigins: ["http://localhost:3000", "http://192.168.100.35:3000"],
   user: {
     modelName: "usersTable",
   },
@@ -19,5 +20,8 @@ export const auth = betterAuth({
   },
   verification: {
     modelName: "verificationsTable",
+  },
+  email: {
+    enabled: true,
   },
 });
