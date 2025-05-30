@@ -1,7 +1,26 @@
 "use client";
-import { CalendarIcon, ClockIcon, DollarSignIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  ClockIcon,
+  DollarSignIcon,
+  Trash2Icon,
+} from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
+import { toast } from "sonner";
 
+import { deleteDoctor } from "@/actions/delete-doctor";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,9 +40,10 @@ import { UpsertDoctorForm } from "./upsert-doctor-form";
 
 interface DoctorCardProps {
   doctor: typeof doctorsTable.$inferSelect;
+  onSuccess?: () => void;
 }
 
-export function DoctorCard({ doctor }: DoctorCardProps) {
+export function DoctorCard({ doctor, onSuccess }: DoctorCardProps) {
   const [isUpsertDoctorDialogOpen, setIsUpsertDoctorDialogOpen] =
     useState(false);
 
@@ -33,6 +53,24 @@ export function DoctorCard({ doctor }: DoctorCardProps) {
     .join("");
 
   const availability = getAvailability(doctor);
+
+  const deleteDoctorAction = useAction(deleteDoctor, {
+    onSuccess: () => {
+      toast.success("Médico deletado com sucesso");
+      onSuccess?.();
+    },
+    onError: () => {
+      toast.error("Erro ao deletar médico");
+    },
+  });
+
+  function handleDeleteDoctor() {
+    if (!doctor?.id) return;
+
+    deleteDoctorAction.execute({
+      id: doctor.id,
+    });
+  }
 
   return (
     <Card>
@@ -71,7 +109,7 @@ export function DoctorCard({ doctor }: DoctorCardProps) {
 
       <Separator />
 
-      <CardFooter>
+      <CardFooter className="flex flex-col gap-2">
         <Dialog
           open={isUpsertDoctorDialogOpen}
           onOpenChange={setIsUpsertDoctorDialogOpen}
@@ -89,6 +127,31 @@ export function DoctorCard({ doctor }: DoctorCardProps) {
             onSuccess={() => setIsUpsertDoctorDialogOpen(false)}
           />
         </Dialog>
+
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="outline" className="w-full">
+              <Trash2Icon /> Deletar médico
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Tem certeza que deseja deletar o médico?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta ação não pode ser revertida. Isso irá deletar o médico
+                permanentemente.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeleteDoctor}>
+                Deletar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardFooter>
     </Card>
   );
