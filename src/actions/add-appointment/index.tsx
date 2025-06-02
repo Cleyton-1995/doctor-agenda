@@ -52,4 +52,5 @@ export const addAppointment = actionClient
       date: appointmentDateTime,
     });
     revalidatePath("/appointments");
+    revalidatePath("/dashboard");
   });
