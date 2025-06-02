@@ -1,6 +1,7 @@
 "use server";
 
 import dayjs from "dayjs";
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
 import { db } from "@/db";
@@ -50,4 +51,5 @@ export const addAppointment = actionClient
       clinicId: session?.user.clinic?.id,
       date: appointmentDateTime,
     });
+    revalidatePath("/appointments");
   });
