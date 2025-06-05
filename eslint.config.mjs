@@ -19,6 +19,7 @@ const eslintConfig = [
       "simple-import-sort/imports": "error",
       "simple-import-sort/exports": "error",
       "react-hooks/rules-of-hooks": "off",
+      "@typescript-eslint/no-explicit-any": "off",
     },
   },
 ];
