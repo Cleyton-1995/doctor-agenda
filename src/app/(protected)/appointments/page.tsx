@@ -19,7 +19,7 @@ import { auth } from "@/lib/auth";
 import AddAppointmentButton from "./_components/add-appointment-button";
 import { appointmentsTableColumns } from "./_components/table-columns";
 
-export default async function AppointmentsPage() {
+const AppointmentsPage = async () => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -66,4 +66,6 @@ export default async function AppointmentsPage() {
       </PageContent>
     </PageContainer>
   );
-}
+};
+
+export default AppointmentsPage;

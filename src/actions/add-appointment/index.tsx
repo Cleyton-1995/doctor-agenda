@@ -24,12 +24,10 @@ export const addAppointment = actionClient
     if (!session?.user.clinic?.id) {
       throw new Error("Clinic not found");
     }
-
     const availableTimes = await getAvailableTimes({
       doctorId: parsedInput.doctorId,
       date: dayjs(parsedInput.date).format("YYYY-MM-DD"),
     });
-
     if (!availableTimes?.data) {
       throw new Error("No available times");
     }
@@ -39,7 +37,6 @@ export const addAppointment = actionClient
     if (!isTimeAvailable) {
       throw new Error("Time not available");
     }
-
     const appointmentDateTime = dayjs(parsedInput.date)
       .set("hour", parseInt(parsedInput.time.split(":")[0]))
       .set("minute", parseInt(parsedInput.time.split(":")[1]))
@@ -47,10 +44,10 @@ export const addAppointment = actionClient
 
     await db.insert(appointmentsTable).values({
       ...parsedInput,
-      id: parsedInput.id,
       clinicId: session?.user.clinic?.id,
       date: appointmentDateTime,
     });
+
     revalidatePath("/appointments");
     revalidatePath("/dashboard");
   });
