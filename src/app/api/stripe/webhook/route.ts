@@ -33,7 +33,7 @@ export const POST = async (request: Request) => {
     console.log("Webhook: metadados da assinatura:", subscription.metadata);
     console.log("Webhook: customer da assinatura:", subscription.customer);
 
-    let userId = subscription.metadata.userId;
+    let userId: string | undefined = subscription.metadata.userId;
 
     // Se não encontrar o userId nos metadados, tente buscar pelo customerId no banco
     if (!userId && customerId) {
