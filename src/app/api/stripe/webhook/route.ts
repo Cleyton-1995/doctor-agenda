@@ -40,7 +40,7 @@ export const POST = async (request: Request) => {
       const user = await db.query.usersTable.findFirst({
         where: eq(usersTable.stripeCustomerId, customerId),
       });
-      userId = user?.id;
+      userId = user?.id as string | undefined;
       console.log("Webhook: userId encontrado pelo customerId:", userId);
     }
 
