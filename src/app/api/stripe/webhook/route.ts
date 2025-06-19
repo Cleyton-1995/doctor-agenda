@@ -23,52 +23,48 @@ export const POST = async (request: Request) => {
     process.env.STRIPE_WEBHOOK_SECRET,
   );
 
-  switch (event.type) {
-    case "invoice.paid": {
-      if (!event.data.object.id) {
-        throw new Error("Subscription ID not found");
-      }
-      const { subscription, subscription_details, customer } = event.data
-        .object as unknown as {
-        customer: string;
-        subscription: string;
-        subscription_details: {
-          metadata: {
-            userId: string;
-          };
-        };
-      };
-      if (!subscription) {
-        throw new Error("Subscription not found");
-      }
-      const userId = subscription_details.metadata.userId;
-      if (!userId) {
-        throw new Error("User ID not found");
-      }
+  // Função auxiliar para atualizar o status da assinatura
+  async function updateSubscriptionStatus(
+    subscriptionId: string,
+    customerId?: string,
+  ) {
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    console.log("Webhook: assinatura recebida:", subscription);
+    console.log("Webhook: metadados da assinatura:", subscription.metadata);
+    console.log("Webhook: customer da assinatura:", subscription.customer);
+
+    let userId = subscription.metadata.userId;
+
+    // Se não encontrar o userId nos metadados, tente buscar pelo customerId no banco
+    if (!userId && customerId) {
+      const user = await db.query.usersTable.findFirst({
+        where: eq(usersTable.stripeCustomerId, customerId),
+      });
+      userId = user?.id;
+      console.log("Webhook: userId encontrado pelo customerId:", userId);
+    }
+
+    if (!userId) {
+      console.warn(
+        "Webhook: User ID not found for subscription",
+        subscriptionId,
+        "customer",
+        customerId,
+      );
+      return; // Não lança erro, só não atualiza
+    }
+
+    if (subscription.status === "active") {
       await db
         .update(usersTable)
         .set({
-          stripeSubscriptionId: subscription,
-          stripeCustomerId: customer,
+          stripeSubscriptionId: subscription.id,
+          stripeCustomerId: subscription.customer as string,
           plan: "essential",
         })
         .where(eq(usersTable.id, userId));
-      break;
-    }
-    case "customer.subscription.deleted": {
-      if (!event.data.object.id) {
-        throw new Error("Subscription ID not found");
-      }
-      const subscription = await stripe.subscriptions.retrieve(
-        event.data.object.id,
-      );
-      if (!subscription) {
-        throw new Error("Subscription not found");
-      }
-      const userId = subscription.metadata.userId;
-      if (!userId) {
-        throw new Error("User ID not found");
-      }
+      console.log("Webhook: Plano atualizado para usuário", userId);
+    } else {
       await db
         .update(usersTable)
         .set({
@@ -77,9 +73,34 @@ export const POST = async (request: Request) => {
           plan: null,
         })
         .where(eq(usersTable.id, userId));
+      console.log("Webhook: Plano removido para usuário", userId);
     }
   }
-  return NextResponse.json({
-    received: true,
-  });
+
+  switch (event.type) {
+    case "customer.subscription.created":
+    case "customer.subscription.updated":
+    case "customer.subscription.deleted": {
+      const object = event.data.object as any;
+      if (object.id) {
+        await updateSubscriptionStatus(object.id, object.customer);
+      } else {
+        console.warn(`${event.type} recebido sem id:`, object);
+      }
+      break;
+    }
+    case "invoice.paid": {
+      const object = event.data.object as any;
+      if (object.subscription) {
+        await updateSubscriptionStatus(object.subscription, object.customer);
+      } else {
+        console.warn("invoice.paid recebido sem subscription:", object);
+      }
+      break;
+    }
+    default:
+      console.log("Webhook: evento ignorado", event.type);
+  }
+
+  return NextResponse.json({ received: true });
 };
