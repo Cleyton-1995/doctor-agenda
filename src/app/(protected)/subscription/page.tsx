@@ -18,7 +18,7 @@ export default async function SubscriptionPage() {
     headers: await headers(),
   });
   if (!session) {
-    redirect("/login");
+    redirect("/authentication");
   }
   if (!session.user.clinic) {
     redirect("/clinic-form");
