@@ -19,14 +19,11 @@ dayjs.extend(timezone);
 export const getAvailableTimes = actionClient
   .schema(
     z.object({
-      doctorId: z.string().uuid(),
+      doctorId: z.string(),
       date: z.string().date(), // YYYY-MM-DD,
     }),
   )
   .action(async ({ parsedInput }) => {
-    if (!parsedInput.doctorId) {
-      throw new Error("ID do médico não fornecido");
-    }
     const session = await auth.api.getSession({
       headers: await headers(),
     });

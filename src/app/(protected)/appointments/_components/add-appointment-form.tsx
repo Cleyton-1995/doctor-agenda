@@ -75,7 +75,6 @@ interface AddAppointmentFormProps {
 }
 
 export default function AddAppointmentForm({
-  appointment,
   patients,
   doctors,
   onSuccess,
@@ -132,7 +131,7 @@ export default function AddAppointmentForm({
         time: "",
       });
     }
-  }, [isOpen, form, appointment]);
+  }, [isOpen, form]);
 
   const createAppointmentAction = useAction(addAppointment, {
     onSuccess: () => {
@@ -268,7 +267,7 @@ export default function AddAppointmentForm({
                     <FormControl>
                       <Button
                         variant={"outline"}
-                        disabled={!isDateTimeEnabled || !selectedDoctorId}
+                        disabled={!isDateTimeEnabled}
                         className={cn(
                           "w-full justify-start text-left font-normal",
                           !field.value && "text-muted-foreground",
@@ -309,7 +308,7 @@ export default function AddAppointmentForm({
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
-                  disabled={!isDateTimeEnabled}
+                  disabled={!isDateTimeEnabled || !selectedDate}
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">
@@ -336,7 +335,7 @@ export default function AddAppointmentForm({
           <DialogFooter>
             <Button type="submit" disabled={createAppointmentAction.isPending}>
               {createAppointmentAction.isPending
-                ? "Salvando..."
+                ? "Criando..."
                 : "Criar agendamento"}
             </Button>
           </DialogFooter>

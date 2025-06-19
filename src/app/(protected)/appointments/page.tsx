@@ -29,7 +29,6 @@ export default async function AppointmentsPage() {
   if (!session.user.clinic) {
     redirect("/clinic-form");
   }
-
   const [patients, doctors, appointments] = await Promise.all([
     db.query.patientsTable.findMany({
       where: eq(patientsTable.clinicId, session.user.clinic.id),

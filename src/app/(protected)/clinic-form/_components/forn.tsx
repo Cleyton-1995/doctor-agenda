@@ -37,6 +37,7 @@ export function ClinicForm() {
       if (isRedirectError(error)) {
         return;
       }
+      console.error(error);
       toast.error("Erro ao criar clínica");
     }
   }

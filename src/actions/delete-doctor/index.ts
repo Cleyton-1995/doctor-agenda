@@ -17,9 +17,6 @@ export const deleteDoctor = actionClient
     }),
   )
   .action(async ({ parsedInput }) => {
-    if (!parsedInput.id) {
-      throw new Error("ID do médico não fornecido");
-    }
     const session = await auth.api.getSession({
       headers: await headers(),
     });

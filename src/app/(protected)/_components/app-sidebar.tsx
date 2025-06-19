@@ -12,7 +12,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -63,7 +62,7 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   async function handleLogout() {
-    authClient.signOut({
+    await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
           router.push("/authentication");
@@ -131,22 +130,16 @@ export function AppSidebar() {
                       {session.data?.user?.clinic?.name}
                     </p>
                     <p className="text-muted-foreground text-sm">
-                      {session.data?.user?.email}
+                      {session.data?.user.email}
                     </p>
                   </div>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
 
               <DropdownMenuContent>
-                <DropdownMenuItem>
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={handleLogout}
-                  >
-                    <LogOut />
-                    Sair
-                  </Button>
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut />
+                  Sair
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
