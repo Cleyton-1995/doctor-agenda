@@ -49,6 +49,12 @@
 
 <hr />
 
+<h3>💳 Integração com Stripe para assinatura</h3>
+<p>Para testar, <strong>não é necessário um cartão real</strong>!</p>
+<p>Use o cartão de teste: <code>4242 4242 4242 4242</code> com qualquer data futura e CVC válido.</p>
+
+<hr/>
+
 <h2>📦 Como rodar o projeto localmente</h2>
 
 <ol>
